@@ -9,7 +9,6 @@ class Spellchecker
   #text_file_name is the path to a local file with text to train the model (find actual words and their #frequency)
   #verbose is a flag to show traces of what's going on (useful for large files)
   def initialize(text_file_name)
-    @dictionary = Hash.new(0)
     contents = IO.read(text_file_name)
     wordsInFile = words(contents)
     train!(wordsInFile)
@@ -26,6 +25,7 @@ class Spellchecker
 
   #train model (create dictionary)
   def train!(word_list)
+    @dictionary = Hash.new(0)
     word_list.each do |s|
       @dictionary[s] += 1
     end
