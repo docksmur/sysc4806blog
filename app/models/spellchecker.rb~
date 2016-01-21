@@ -9,6 +9,7 @@ class Spellchecker
   #text_file_name is the path to a local file with text to train the model (find actual words and their #frequency)
   #verbose is a flag to show traces of what's going on (useful for large files)
   def initialize(text_file_name)
+    @dictionary = Hash.new(0)
     contents = IO.read(text_file_name)
     wordsInFile = words(contents)
     train!(wordsInFile)
@@ -25,7 +26,6 @@ class Spellchecker
 
   #train model (create dictionary)
   def train!(word_list)
-    @dictionary = Hash.new(0)
     word_list.each do |s|
       @dictionary[s] += 1
     end
@@ -38,15 +38,41 @@ class Spellchecker
   
   #generate all correction candidates at an edit distance of 1 from the input word.
   def edits1(word)
-    
     deletes    = []
-    #all strings obtained by deleting a letter (each letter)
+    letters = word.split("")
+    letters.each do |c|
+      word2 = word
+      deletes.push(word2.delete(c))
+    end
+
     transposes = []
-    #all strings obtained by switching two consecutive letters
+    for i in 0..word.length-1
+      letters = word.split("")
+      letters2 = letters
+      letters2.insert(i+1 , letters2.delete_at(i))
+      transposes.push(letters2.join())
+    end
+
     inserts = []
-    # all strings obtained by inserting letters (all possible letters in all possible positions)
+    ALPHABET.split("").each do |c|
+        for i in 0..word.length
+          letters = word.split("")
+          letters2 = letters
+          letters2.insert(i,c)
+          inserts.push(letters2.join())
+        end
+    end
+
     replaces = []
-    #all strings obtained by replacing letters (all possible letters in all possible positions)
+    ALPHABET.split("").each do |c|
+	for i in 0..word.length-1
+          letters = word.split("")
+          letters2 = letters
+          letters2.delete_at(i)
+          letters2.insert(i,c)
+          replaces.push(letters2.join())
+        end
+    end
 
     return (deletes + transposes + replaces + inserts).to_set.to_a #eliminate duplicates, then convert back to array
   end
@@ -54,12 +80,16 @@ class Spellchecker
 
   # find known (in dictionary) distance-2 edits of target word.
   def known_edits2 (word)
-    # get every possible distance - 2 edit of the input word. Return those that are in the dictionary.
+    dist2 = []
+    edits1(word).each do |s|
+      dist2 += edits1(s)
+    end
+    return known(dist2)
   end
 
   #return subset of the input words (argument is an array) that are known by this dictionary
   def known(words)
-    return words.find_all {true } #find all words for which condition is true,
+    return words.find_all {|k| @dictionary.key?(k) } #find all words for which condition is true,
                                     #you need to figure out this condition
     
   end
@@ -73,6 +103,22 @@ class Spellchecker
   # returns distance-2 replacements sorted by descending frequency in the model
   # else returns nil
   def correct(word)
+     if (known([word]).count>0)
+       return known([word])
+     elsif (known(edits1(word)).count>0)
+       res = known(edits1(word)).sort_by do |word|
+         @dictionary[word]
+       end
+       return res.reverse
+     elsif (known_edits2(word).count>0)
+       res = known_edits2(word).sort_by do |word|
+         @dictionary[word]
+       end
+       return res.reverse
+     else
+       return nil
+     end
+
   end
     
   
