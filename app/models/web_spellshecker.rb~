@@ -1,0 +1,7 @@
+class WebSpellshecker < Spellchecker
+  def initialize()
+  end
+  def correct()
+    return ["testing", "purposes"]
+  end
+end
