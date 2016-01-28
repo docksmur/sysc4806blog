@@ -89,7 +89,12 @@ class Spellchecker
 
   #return subset of the input words (argument is an array) that are known by this dictionary
   def known(words)
-    return words.find_all {|k| @dictionary.key?(k) } #find all words for which condition is true,
+    temp = words.find_all {|k| @dictionary.key?(k) } 
+    res = temp.sort_by do |word|
+      @dictionary[word]
+    end
+    return res.reverse
+    #find all words for which condition is true,
                                     #you need to figure out this condition
     
   end
@@ -106,15 +111,9 @@ class Spellchecker
      if (known([word]).count>0)
        return known([word])
      elsif (known(edits1(word)).count>0)
-       res = known(edits1(word)).sort_by do |word|
-         @dictionary[word]
-       end
-       return res.reverse
+       return known(edits1(word))
      elsif (known_edits2(word).count>0)
-       res = known_edits2(word).sort_by do |word|
-         @dictionary[word]
-       end
-       return res.reverse
+       return known_edits2(word)
      else
        return nil
      end

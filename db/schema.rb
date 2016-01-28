@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160121044500) do
+ActiveRecord::Schema.define(version: 20160128135803) do
 
   create_table "blogposts", force: true do |t|
     t.string   "title"
@@ -24,6 +24,13 @@ ActiveRecord::Schema.define(version: 20160121044500) do
     t.text     "commenttext"
     t.string   "author"
     t.integer  "blogpost_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "dictionary_words", force: true do |t|
+    t.string   "word"
+    t.integer  "count"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

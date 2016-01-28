@@ -84,7 +84,7 @@ class Spellchecker
     edits1(word).each do |s|
       dist2 += edits1(s)
     end
-    return known(dist2)
+    return known(dist2.to_set.to_a)
   end
 
   #return subset of the input words (argument is an array) that are known by this dictionary
