@@ -12,5 +12,5 @@ $(document).on 'page:change', -> #when the page has loaded… do all this.
 			if (word.length>0) # if the current word is a sequence of letters
 				temp = word
 				word=""
-				$.get 'http://localhost:3000/spellcheck/'+temp, (data) -> #send ajax request with current word.
+				$.get 'http://localhost:3000/spellcheck/'+word, (data) -> #send ajax request with current word.
 					$('body').append('<div class= "fix"> did you mean: '+data.suggestions.join(", ")+'?</div>')
